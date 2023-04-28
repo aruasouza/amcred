@@ -1,0 +1,5 @@
+numpy
+flask
+PyJWT
+xgboost
+flask_sqlalchemy

@@ -24,12 +24,13 @@ def login_post():
 @auth.route('/signup', methods=['POST'])
 def signup_post():
     auth = request.authorization
+    json = request.json
 
     if (auth.username != 'admin') or (auth.password != admin_pass):
         return jsonify({'message':'Permissão de administrador negada.'}),401
 
-    username = request.form.get('username')
-    password = request.form.get('password')
+    username = json['username']
+    password = json['password']
     user = User.query.filter_by(username=username).first()
     if user:
         return jsonify({'message':'Usuário já existe.'}),400
