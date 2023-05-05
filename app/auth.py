@@ -19,7 +19,7 @@ def login_post():
         return jsonify({'message':'Usuário ou senha incorretos.'}),401
     
     token = jwt.encode({'user':username,'exp':datetime.utcnow() + timedelta(hours = 24)},secret,algorithm="HS256")
-    return jsonify({'token':token})
+    return jsonify({'token':token}),200
 
 @auth.route('/signup', methods=['POST'])
 def signup_post():

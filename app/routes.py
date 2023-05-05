@@ -18,13 +18,13 @@ def token_required(f):
     def decorated(*args,**kwargs):
         token = request.json['token']
         if not token:
-            return jsonify({'message':'Token ausente.'}),401
+            return jsonify({'message':'Token ausente'}),401
         try:
             data = decode(token,secret,algorithms=["HS256"])
         except InvalidSignatureError:
-            return jsonify({'message':'Token inválido.'}),401
+            return jsonify({'message':'Token inválido'}),401
         except ExpiredSignatureError:
-            return jsonify({'message':'Token expirado.'}),401
+            return jsonify({'message':'Token expirado'}),401
         return f(*args,**kwargs)
     return decorated
 
@@ -33,7 +33,7 @@ def token_required(f):
 def index():
     dados = request.json['dados']
     if not dados:
-        jsonify({'message':'Nenhuma informação recebida.'}),400
+        jsonify({'message':'Nenhuma informação recebida'}),400
     data_dict = {}
     valores_negados = {}
     for atributo in atributos:
@@ -45,6 +45,6 @@ def index():
             else:
                 valores_negados[atributo] = dados.pop(atributo)
     if valores_negados or dados:
-        return jsonify({'message':'Alguns atributos e/ou valores não foram reconhecidos.',
+        return jsonify({'message':'Alguns atributos e/ou valores não foram reconhecidos',
                         'errors':{'atributos negados':dados,'valores negados':valores_negados}}),400
     return jsonify({'probabilidade':calculate(data_dict)}),200
