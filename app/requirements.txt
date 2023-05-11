@@ -1,5 +1,5 @@
-numpy
-flask
-PyJWT
-xgboost
-flask_sqlalchemy
+darts
+requests
+plotly
+imblearn
+tensorflow

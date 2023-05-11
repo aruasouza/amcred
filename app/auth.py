@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime,timedelta
-from models import db,User
+from models import db
 from key import secret,admin_pass
 
 auth = Blueprint('auth', __name__)
@@ -13,9 +13,11 @@ def login_post():
     username = auth.username
     password = auth.password
 
-    user = User.query.filter_by(username=username).first()
+    user = db.get_user(username)
 
-    if not user or not check_password_hash(user.password, password):
+    if not user:
+        return jsonify({'message':'Usuário ou senha incorretos.'}),401
+    elif not check_password_hash(user['password'], password):
         return jsonify({'message':'Usuário ou senha incorretos.'}),401
     
     token = jwt.encode({'user':username,'exp':datetime.utcnow() + timedelta(hours = 24)},secret,algorithm="HS256")
@@ -31,11 +33,18 @@ def signup_post():
 
     username = json['username']
     password = json['password']
-    user = User.query.filter_by(username=username).first()
+    profile = json['profile']
+    orgname = json['organization']
+
+    user = db.get_user(username)
     if user:
         return jsonify({'message':'Usuário já existe.'}),400
-    new_user = User(username=username, password=generate_password_hash(password, method='sha256'))
+    org = db.get_org(orgname)
+    if not org:
+        return jsonify({'message':'Organização não cadastrada.'}),400
+    
+    new_user = username,generate_password_hash(password, method='scrypt'),profile,org['id']
 
-    db.session.add(new_user)
-    db.session.commit()
+    db.create_user(*new_user)
+
     return jsonify({'message':'Usuário criado com sucesso.'}),200
